@@ -1,0 +1,4 @@
+Revision history for Perl extension Plack::Middleware::Debug::LazyLoadModules
+
+0.01    8:35 2012/02/17
+        - original version
