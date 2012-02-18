@@ -1,29 +1,42 @@
 package Plack::Middleware::Debug::LazyLoadModules;
 use strict;
 use warnings;
+use Plack::Util::Accessor qw/filter/;
 use parent qw/Plack::Middleware::Debug::Base/;
 our $VERSION = '0.01';
-
-our %modules;
 
 sub run {
     my($self, $env, $panel) = @_;
 
-    %modules = ();
+    my %modules = ();
     $modules{$_}++ for keys %INC;
 
     return sub {
         my $res = shift;
 
-        my @lazy_load_modules = grep { !$modules{$_} } keys %INC;
+        my @lazy_load_modules;
+        for my $module (keys %INC) {
+            next if $modules{$module};
+            my $filter = $self->filter;
+            if ( !$filter || (_is_regexp($filter) && $module =~ /$filter/) ) {
+                push @lazy_load_modules, $module;
+            }
+        }
 
         $panel->nav_subtitle(
-            sprintf "%d modules loaded", scalar(@lazy_load_modules)
+            sprintf(
+                "%d/%d lazy loaded",
+                    scalar(@lazy_load_modules), scalar(keys %modules),
+            )
         );
         $panel->content(
-            $self->render_lines(\@lazy_load_modules),
+            $self->render_lines([sort @lazy_load_modules]),
         );
     };
+}
+
+sub _is_regexp {
+    (ref($_[0]) eq 'Regexp') ? 1 : 0;
 }
 
 1;
