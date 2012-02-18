@@ -1,4 +1,8 @@
 Revision history for Perl extension Plack::Middleware::Debug::LazyLoadModules
 
+0.02    18:38 2012/02/18
+        - fixed POD
+        - added filter option
+
 0.01    8:35 2012/02/17
         - original version

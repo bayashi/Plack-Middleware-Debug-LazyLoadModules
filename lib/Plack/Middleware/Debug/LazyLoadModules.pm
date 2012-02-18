@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Plack::Util::Accessor qw/filter/;
 use parent qw/Plack::Middleware::Debug::Base/;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub run {
     my($self, $env, $panel) = @_;
