@@ -13,6 +13,7 @@ my $builder = Module::Build->new(
         'HTTP::Request::Common' => 0,
     },
     requires => {
+        'Plack::Middleware::Debug' => 0,
         'parent' => 0,
         'Carp' => 0,
     },

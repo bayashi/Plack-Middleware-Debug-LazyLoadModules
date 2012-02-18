@@ -1,5 +1,9 @@
 Revision history for Perl extension Plack::Middleware::Debug::LazyLoadModules
 
+0.04    8:18 2012/02/19
+        [note: NO CODE CHANGE]
+        - added dependancy module in Build.PL
+
 0.03    6:11 2012/02/19
         - added class option: change Foo/Bar.pm to Foo::Bar
 
