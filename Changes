@@ -1,5 +1,8 @@
 Revision history for Perl extension Plack::Middleware::Debug::LazyLoadModules
 
+0.03    6:11 2012/02/19
+        - added class option: change Foo/Bar.pm to Foo::Bar
+
 0.02    18:38 2012/02/18
         - fixed POD
         - added filter option

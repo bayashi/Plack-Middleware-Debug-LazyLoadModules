@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Plack::Util::Accessor qw/filter class/;
 use parent qw/Plack::Middleware::Debug::Base/;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub run {
     my($self, $env, $panel) = @_;
@@ -66,9 +66,11 @@ Plack::Middleware::Debug::LazyLoadModules - debug panel for Lazy Load Modules
       $app;
     };
 
-or you can set `filter` option(Regexp reference).
+or you can set `filter` option(Regexp reference) and `class` option(Foo/Bar.pm to Foo::Bar).
 
-      enable 'Debug::LazyLoadModules', filter => qr/\.pm$/;
+      enable 'Debug::LazyLoadModules',
+        filter => qr/\.pm$/,
+        class  => 1;
 
 
 =head1 DESCRIPTION
