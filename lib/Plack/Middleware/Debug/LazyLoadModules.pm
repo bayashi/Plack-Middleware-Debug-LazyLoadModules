@@ -52,13 +52,25 @@ Plack::Middleware::Debug::LazyLoadModules - debug panel for Lazy Load Modules
 
     use Plack::Builder;
     builder {
-      enable 'Debug', panels => [qw/LazyLoadModules/];
+      enable 'Debug::LazyLoadModules';
       $app;
     };
+
+or you can set `filter` option(Regexp reference).
+
+      enable 'Debug::LazyLoadModules', filter => qr/\.pm$/;
+
 
 =head1 DESCRIPTION
 
 Plack::Middleware::Debug::LazyLoadModules is debug panel for watching lazy loaded modules.
+
+
+=head1 METHOD
+
+=head2 run
+
+see L<Plack::Middleware::Debug::Base>
 
 
 =head1 REPOSITORY
