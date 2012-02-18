@@ -1,7 +1,7 @@
 package Plack::Middleware::Debug::LazyLoadModules;
 use strict;
 use warnings;
-use Plack::Util::Accessor qw/filter/;
+use Plack::Util::Accessor qw/filter class/;
 use parent qw/Plack::Middleware::Debug::Base/;
 our $VERSION = '0.02';
 
@@ -19,7 +19,7 @@ sub run {
             next if $modules{$module};
             my $filter = $self->filter;
             if ( !$filter || (_is_regexp($filter) && $module =~ /$filter/) ) {
-                push @lazy_load_modules, $module;
+                push @lazy_load_modules, $self->_classnize($module);
             }
         }
 
@@ -33,6 +33,16 @@ sub run {
             $self->render_lines([sort @lazy_load_modules]),
         );
     };
+}
+
+sub _classnize {
+    my ($self, $module_path) = @_;
+
+    if ($self->class && $module_path =~ /\.pm$/) {
+        $module_path =~ s!/!::!g;
+        $module_path =~ s!\.pm$!!g;
+    }
+    return $module_path;
 }
 
 sub _is_regexp {
