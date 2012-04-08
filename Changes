@@ -1,5 +1,9 @@
 Revision history for Perl extension Plack::Middleware::Debug::LazyLoadModules
 
+0.05    17:19 2012/04/08
+        also show preload modules
+        added elements option
+
 0.04    8:18 2012/02/19
         [note: NO CODE CHANGE]
         - added dependancy module in Build.PL
