@@ -1,9 +1,15 @@
 package Plack::Middleware::Debug::LazyLoadModules;
 use strict;
 use warnings;
-use Plack::Util::Accessor qw/filter class/;
+use Plack::Util::Accessor qw/filter class elements/;
 use parent qw/Plack::Middleware::Debug::Base/;
 our $VERSION = '0.04';
+
+sub prepare_app {
+    my $self = shift;
+    $self->elements([qw/lazy preload/])
+        unless $self->elements;
+}
 
 sub run {
     my($self, $env, $panel) = @_;
@@ -12,25 +18,36 @@ sub run {
     $modules{$_}++ for keys %INC;
 
     return sub {
-        my $res = shift;
-
-        my @lazy_load_modules;
+        my %preload_modules;
+        my %lazy_load_modules;
+        my $preload = $self->_included('preload');
+        my $lazy    = $self->_included('lazy');
+        my $filter  = $self->filter;
         for my $module (keys %INC) {
-            next if $modules{$module};
-            my $filter = $self->filter;
-            if ( !$filter || (_is_regexp($filter) && $module =~ /$filter/) ) {
-                push @lazy_load_modules, $self->_classnize($module);
+            next if $filter && _is_regexp($filter) && $module !~ /$filter/;
+            if ($preload && $modules{$module}) {
+                $preload_modules{$self->_classnize($module)} = $INC{$module};
+            }
+            elsif ($lazy && !$modules{$module}) {
+                $lazy_load_modules{$self->_classnize($module)} = $INC{$module};
             }
         }
 
+        $panel->title('Lazy Load Modules');
         $panel->nav_subtitle(
             sprintf(
                 "%d/%d lazy loaded",
-                    scalar(@lazy_load_modules), scalar(keys %modules),
+                    scalar(keys %lazy_load_modules), scalar(keys %modules),
             )
         );
         $panel->content(
-            $self->render_lines([sort @lazy_load_modules]),
+            $self->render_hash(
+                +{
+                    lazy    => \%lazy_load_modules,
+                    preload => \%preload_modules,
+                },
+                $self->elements,
+            )
         );
     };
 }
@@ -47,6 +64,15 @@ sub _classnize {
 
 sub _is_regexp {
     (ref($_[0]) eq 'Regexp') ? 1 : 0;
+}
+
+sub _included {
+    my ($self, $element) = @_;
+
+    for my $e (@{$self->elements}) {
+        return 1 if $element eq $e;
+    }
+    return;
 }
 
 1;
@@ -72,6 +98,11 @@ or you can set `filter` option(Regexp reference) and `class` option(Foo/Bar.pm t
         filter => qr/\.pm$/,
         class  => 1;
 
+if you want to specify the element(ex. lazy, preload) for showing on the debug panel, you set `elements` option. All elements show on the debug panel by default.
+
+      enable 'Debug::LazyLoadModules',
+        elements => [qw/lazy/],
+
 
 =head1 DESCRIPTION
 
@@ -79,6 +110,10 @@ Plack::Middleware::Debug::LazyLoadModules is debug panel for watching lazy loade
 
 
 =head1 METHOD
+
+=head2 prepare_app
+
+see L<Plack::Middleware::Debug>
 
 =head2 run
 
